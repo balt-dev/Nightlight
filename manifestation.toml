@@ -1,0 +1,17 @@
+
+id = "WebfishingSampleMod"
+name = "Webfishing Sample Mod"
+description = "This is a sample mod."
+version = "1.0.0"
+homepage = "https://github.com/NotNite/WebfishingSampleMod"
+author = "You!"
+
+icon = "icon.png"
+readme = "README.md"
+
+[project]
+csharp = "./WebfishingSampleMod/WebfishingSampleMod.csproj"
+godot = "./project/project.godot"
+
+[[dependencies]]
+thunderstore_version = "NotNet-GDWeave-2.0.14"
