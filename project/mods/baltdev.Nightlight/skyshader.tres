@@ -1,0 +1,84 @@
+[gd_resource type="Shader" format=2]
+
+[resource]
+code = "shader_type canvas_item;
+
+uniform float altitude;
+uniform float azimuth;
+uniform float time;
+
+const float PI = 3.14159265;
+
+// Rotation matrix around the X-axis (pitch)
+mat3 rot_x(float angle_rad) {
+    float c = cos(angle_rad);
+    float s = sin(angle_rad);
+    return mat3(
+        vec3(1.0, 0.0, 0.0),
+        vec3(0.0, c, -s),
+        vec3(0.0, s, c)
+    );
+}
+
+// Rotation matrix around the Y-axis (yaw)
+mat3 rot_y(float angle_rad) {
+    float c = cos(angle_rad);
+    float s = sin(angle_rad);
+    return mat3(
+        vec3(c, 0.0, s),
+        vec3(0.0, 1.0, 0.0),
+        vec3(-s, 0.0, c)
+    );
+}
+
+mat3 rot_z(float angle_rad) {
+    float c = cos(angle_rad);
+    float s = sin(angle_rad);
+    return mat3(
+        vec3(c, -s, 0.0),
+        vec3(s, c, 0.0),
+        vec3(0.0, 0.0, 1.0)
+    );
+}
+
+
+vec3 angles_to_vec(float x_rot, float y_rot) {
+    vec3 north = vec3(0, 0, 1);
+
+    // Calculate rotation matrices
+    mat3 x_rot_mat = rot_x(x_rot); // Rotation around x-axis (pitch)
+    mat3 y_rot_mat = rot_y(y_rot); // Rotation around y-axis (yaw)
+
+    // Apply rotations.  Order matters!  Typically, yaw (y-axis) is applied first, then pitch (x-axis).
+    vec3 direction = y_rot_mat * x_rot_mat * north;
+
+    return normalize(direction); // Normalize to ensure a unit vector
+}
+
+float random (vec2 st) {
+    return fract(sin(dot(st.xy, vec2(12.9898, 78.233))) * 43758.5453);
+}
+
+vec2 snap(vec2 x, float nearest) {
+	return round(x / nearest) * nearest;
+}
+
+void fragment() {
+	float x_rot = (UV.y - 0.5) * PI;
+	float y_rot = (UV.x - 0.5) * 2.0 * PI;
+	vec3 heading = angles_to_vec(x_rot, y_rot);
+	vec3 sun_position = angles_to_vec(altitude, azimuth);
+	float facing = dot(heading, sun_position);
+	
+	vec2 sampler = vec2(x_rot, y_rot * cos(x_rot));
+	sampler = snap(sampler, 0.05);
+	float star_rand = random(sampler);
+	
+	float col;
+	if (facing > 0.95 || star_rand > 0.95) {
+		col = 1.0;
+	} else {
+		col = 0.0;
+	}
+	COLOR = vec4(vec3(col), 1);
+}"
