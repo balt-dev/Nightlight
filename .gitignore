@@ -6,5 +6,7 @@
 bin/
 obj/
 *.pck
+*.import
+.godot
 
 manifestation/

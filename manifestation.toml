@@ -1,17 +1,21 @@
 
-id = "WebfishingSampleMod"
-name = "Webfishing Sample Mod"
-description = "This is a sample mod."
+id = "baltdev.Nightlight"
+name = "Nightlight"
+description = "Supplementary mod for DayAndNight that adds more accurate lighting."
 version = "1.0.0"
-homepage = "https://github.com/NotNite/WebfishingSampleMod"
-author = "You!"
+homepage = "https://github.com/baltdev/Nightlight"
+author = "baltdev"
 
 icon = "icon.png"
 readme = "README.md"
 
 [project]
-csharp = "./WebfishingSampleMod/WebfishingSampleMod.csproj"
+csharp = "./csharp/Nightlight/Nightlight.csproj"
 godot = "./project/project.godot"
 
 [[dependencies]]
 thunderstore_version = "NotNet-GDWeave-2.0.14"
+
+[[dependencies]]
+id = "TackleBox"
+thunderstore_version = "PuppyGirl-TackleBox-0.5.2"
