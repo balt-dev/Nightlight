@@ -15,6 +15,6 @@ godot = "./project/project.godot"
 [[dependencies]]
 thunderstore_version = "NotNet-GDWeave-2.0.14"
 
-[[dependencies]]
-id = "TackleBox"
-thunderstore_version = "PuppyGirl-TackleBox-0.5.2"
+# [[dependencies]]
+# id = "TackleBox"
+# thunderstore_version = "PuppyGirl-TackleBox-0.5.2"

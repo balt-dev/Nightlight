@@ -80,10 +80,10 @@ func approximate_skylight_color(altitude : float) -> Color:
 	else:
 		return DAY_COLOR
 
-var worldenv: WorldEnvironment;
-var dirlight: DirectionalLight;
-var camera: Camera;
-var sun: Sprite3D;
+var worldenv: WorldEnvironment
+var dirlight: DirectionalLight
+var camera: Camera
+var sun: Sprite3D
 
 func _physics_process(_delta):
 	if camera == null || !is_instance_valid(camera):
@@ -113,6 +113,7 @@ func _physics_process(_delta):
 			return
 		
 	if (sun == null || !is_instance_valid(sun)) && dirlight != null && is_instance_valid(dirlight):
+		print("instantiating sun")
 		sun = SUN_SCENE.instance()
 		sun.name = "a deadly lazer"
 		sun.translation = Vector3(0, 0, 2000)
@@ -160,12 +161,13 @@ func _physics_process(_delta):
 	wenv.tonemap_mode = Environment.TONE_MAPPER_ACES
 	wenv.tonemap_exposure = 1.12
 
-var config: Dictionary
+var config: Dictionary = {}
 var default_config: Dictionary = {
 	"latitude": 40,
 	"longitude": -90,
 	"time_scale": 1
 }
+
 onready var TackleBox := $"/root/TackleBox"
 
 const MOD_ID: String = "baltdev.Nightlight"
@@ -185,7 +187,7 @@ func _init_config() -> void:
 	config = saved_config
 	TackleBox.set_mod_config(MOD_ID, config) # Save it to a config file!
 
-func _on_config_update(mod_id: String, new_config: Dictionary) -> void:
+func _on_config_update(mod_id, new_config):
 	if mod_id != MOD_ID: # Check if it's our mod being updated
 		return
 	
