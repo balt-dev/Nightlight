@@ -1,0 +1,33 @@
+[gd_scene load_steps=4 format=2]
+
+[ext_resource path="res://mods/baltdev.Nightlight/sun.png" type="Texture" id=2]
+
+[sub_resource type="StreamTexture" id=2]
+flags = 2
+load_path = "res://.import/sun.png-be010f29df228226728390d3373ec2ef.stex"
+
+[sub_resource type="SpatialMaterial" id=1]
+flags_transparent = true
+flags_unshaded = true
+flags_vertex_lighting = true
+flags_do_not_receive_shadows = true
+flags_disable_ambient_light = true
+params_blend_mode = 1
+params_depth_draw_mode = 1
+params_billboard_mode = 1
+params_billboard_keep_scale = true
+albedo_texture = SubResource( 2 )
+
+[node name="Sprite3D" type="Sprite3D"]
+sorting_use_aabb_center = false
+material_override = SubResource( 1 )
+cast_shadow = 0
+extra_cull_margin = 16384.0
+generate_lightmap = false
+pixel_size = 6.0
+billboard = 1
+double_sided = false
+no_depth_test = true
+fixed_size = true
+alpha_cut = 2
+texture = ExtResource( 2 )

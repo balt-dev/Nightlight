@@ -10,7 +10,6 @@ icon = "icon.png"
 readme = "README.md"
 
 [project]
-csharp = "./csharp/Nightlight/Nightlight.csproj"
 godot = "./project/project.godot"
 
 [[dependencies]]

@@ -2,6 +2,8 @@ extends Node
 
 var is_halloween: bool
 
+export var sky_color: Color
+
 func approximate_sun_position(latitude: float, longitude: float) -> Dictionary:
 	var lat = deg2rad(latitude)
 	
@@ -13,7 +15,7 @@ func approximate_sun_position(latitude: float, longitude: float) -> Dictionary:
 	var minute = now["minute"]
 	var second = now["second"]
 	
-	is_halloween = true # month == 10 and day == 31
+	is_halloween = month == 10 and day == 31
 	
 	var day_of_year = calculate_day_of_year(year, month, day)	
 	second += fmod(Time.get_unix_time_from_system(), 1.0)
@@ -62,6 +64,7 @@ const HALLOWEEN_NIGHT_COLOR: Color = Color(0.1, 0.04, 0.02)
 const HALLOWEEN_MOON_COLOR: Color = Color(0.4, 0.0, 0)
 
 func approximate_skylight_color(altitude : float) -> Color:
+	altitude += 5# hack
 	var night = NIGHT_COLOR
 	if is_halloween:
 		night = HALLOWEEN_NIGHT_COLOR
@@ -79,8 +82,13 @@ func approximate_skylight_color(altitude : float) -> Color:
 
 var worldenv: WorldEnvironment;
 var dirlight: DirectionalLight;
+var camera: Camera;
+var sun: Sprite3D;
 
 func _physics_process(_delta):
+	if camera == null || !is_instance_valid(camera):
+		camera = get_viewport().get_camera()
+		
 	if worldenv == null || !is_instance_valid(worldenv):
 		var world_viewport = get_tree().get_nodes_in_group("world_viewport")
 		if world_viewport.empty(): return
@@ -103,6 +111,12 @@ func _physics_process(_delta):
 			dirlight = dli
 		else:
 			return
+		
+	if (sun == null || !is_instance_valid(sun)) && dirlight != null && is_instance_valid(dirlight):
+		sun = SUN_SCENE.instance()
+		sun.name = "a deadly lazer"
+		sun.translation = Vector3(0, 0, 2000)
+		dirlight.add_child(sun, true)
 			
 	var wenv = worldenv.environment
 	wenv.fog_enabled = false
@@ -110,34 +124,39 @@ func _physics_process(_delta):
 	wenv.ambient_light_energy = 0.3
 
 	dirlight.light_negative = false
-	dirlight.shadow_enabled = true
 
 	var sky_position = approximate_sun_position(config.latitude, config.longitude)
 	var color = approximate_skylight_color(rad2deg(sky_position.altitude))
 	
 	if worldenv.rain:
+		sun.opacity = 0.1
 		var grey = color.get_luminance()
-		color = color.linear_interpolate(Color(grey,grey,grey), 0.7).darkened(0.25)
+		color = color.linear_interpolate(Color(grey,grey,grey), 0.9).darkened(0.25)
 	
 	var degalt = rad2deg(sky_position.altitude)
-	if degalt > -4:
+	if degalt > -9:
 		dirlight.rotation.x = -sky_position.altitude
-		dirlight.rotation.y = sky_position.azimuth
-		dirlight.light_energy = clamp((rad2deg(sky_position.altitude) + 4) / 5, 0, 1)
+		dirlight.rotation.y = -sky_position.azimuth
+		dirlight.light_energy = clamp((rad2deg(sky_position.altitude) + 9) / 5, 0, 1)
 		dirlight.light_color = color
+		sun.visible = true		
 	else:
 		dirlight.rotation.x = sky_position.altitude
-		dirlight.rotation.y = -sky_position.azimuth		
-		dirlight.light_energy = clamp((-4 - rad2deg(sky_position.altitude)) / 5, 0, 1)
+		dirlight.rotation.y = sky_position.azimuth		
+		dirlight.light_energy = clamp((-9 - rad2deg(sky_position.altitude)) / 5, 0, 1)
 		var moon = MOON_COLOR
 		if is_halloween:
 			moon = HALLOWEEN_MOON_COLOR
-		dirlight.light_color = MOON_COLOR		
-	
+		dirlight.light_color = MOON_COLOR
+		sun.visible = false		
+		
+	sky_color = color
 	worldenv.des_color = color
-	wenv.fog_color = color
-	wenv.background_color = color
-	wenv.ambient_light_color = color.lightened(0.3)
+	worldenv.ambient_light_color = color.brightened(0.3)
+	if is_halloween and degalt < -9:
+		var spookiness = clamp((-9 - rad2deg(sky_position.altitude)) / 5, 0, 1)
+		worldenv.des_color *= Color.white.linear_interpolate(Color(1.0, 0.2, 0.2), spookiness)
+		worldenv.ambient_light_color *= Color.white.linear_interpolate(Color(1.0, 0.2, 0.2), spookiness)
 	wenv.tonemap_mode = Environment.TONE_MAPPER_ACES
 	wenv.tonemap_exposure = 1.12
 
@@ -145,25 +164,26 @@ var config: Dictionary
 var default_config: Dictionary = {
 	"latitude": 40,
 	"longitude": -90,
-	"time_scale": 2000
+	"time_scale": 1
 }
 onready var TackleBox := $"/root/TackleBox"
 
 const MOD_ID: String = "baltdev.Nightlight"
+const SUN_SCENE: PackedScene = preload("res://mods/baltdev.Nightlight/sun.tscn")
 
 func _ready() -> void:
 	_init_config()
-	#TackleBox.connect("mod_config_updated", self, "_on_config_update")
+	TackleBox.connect("mod_config_updated", self, "_on_config_update")
 
 func _init_config() -> void:
-	var saved_config = {}#TackleBox.get_mod_config(MOD_ID)
+	var saved_config = TackleBox.get_mod_config(MOD_ID)
 
 	for key in default_config.keys():
 		if not key in saved_config: # If the config property isn't saved...
 			saved_config[key] = default_config[key] # Set it to the default
 	
 	config = saved_config
-	#TackleBox.set_mod_config(MOD_ID, config) # Save it to a config file!
+	TackleBox.set_mod_config(MOD_ID, config) # Save it to a config file!
 
 func _on_config_update(mod_id: String, new_config: Dictionary) -> void:
 	if mod_id != MOD_ID: # Check if it's our mod being updated
