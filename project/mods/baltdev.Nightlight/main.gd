@@ -62,18 +62,17 @@ const HALLOWEEN_NIGHT_COLOR: Color = Color(0.1, 0.04, 0.02)
 const HALLOWEEN_MOON_COLOR: Color = Color(0.4, 0, 0)
 
 func approximate_skylight_color(altitude : float) -> Color:
-	altitude += 5# hack
 	var night = night_color
 	if is_halloween:
 		night = HALLOWEEN_NIGHT_COLOR
-	if altitude < -4:
-		var twilight_factor = clamp(-(4 + max(altitude, - 10)) / 6.0, 0.0, 1.0)
+	if altitude < -5:
+		var twilight_factor = clamp(-(5 + max(altitude, - 10)) / 5.0, 0.0, 1.0)
 		return dawn_color.linear_interpolate(night, twilight_factor)
 	elif altitude < 0:
-		var sunrise_factor = clamp(-altitude / 4.0, 0.0, 1.0)
+		var sunrise_factor = clamp(-altitude / 5.0, 0.0, 1.0)
 		return sunrise_color.linear_interpolate(dawn_color, sunrise_factor)
-	elif altitude < 7:
-		var day_factor = clamp(altitude / 7.0, 0.0, 1.0)
+	elif altitude < 15:
+		var day_factor = clamp(altitude / 15.0, 0.0, 1.0)
 		return sunrise_color.linear_interpolate(day_color, day_factor)
 	else:
 		return day_color

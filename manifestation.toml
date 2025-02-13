@@ -2,7 +2,7 @@
 id = "baltdev.Nightlight"
 name = "Daylight"
 description = "Supplementary mod for DayAndNight that adds more accurate lighting."
-version = "1.0.0"
+version = "1.0.1"
 homepage = "https://github.com/balt-dev/Nightlight"
 author = "baltdev"
 
