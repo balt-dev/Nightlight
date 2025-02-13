@@ -1,4 +1,4 @@
-# Nightlight
+# Daylight
 
 Addon to DayAndNight to make the skylight a little more realistic. Requires TackleBox.
 

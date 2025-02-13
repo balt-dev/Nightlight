@@ -2,8 +2,6 @@ extends Node
 
 var is_halloween: bool
 
-export var sky_color: Color
-
 func approximate_sun_position(latitude: float, longitude: float) -> Dictionary:
 	var lat = deg2rad(latitude)
 	
@@ -100,7 +98,7 @@ func _physics_process(_delta):
 		else:
 			return
 
-			
+		
 	if dirlight == null || !is_instance_valid(dirlight):
 		var world_viewport = get_tree().get_nodes_in_group("world_viewport")
 		if world_viewport.empty(): return
@@ -113,7 +111,6 @@ func _physics_process(_delta):
 			return
 		
 	if (sun == null || !is_instance_valid(sun)) && dirlight != null && is_instance_valid(dirlight):
-		print("instantiating sun")
 		sun = SUN_SCENE.instance()
 		sun.name = "a deadly lazer"
 		sun.translation = Vector3(0, 0, 2000)
@@ -150,14 +147,13 @@ func _physics_process(_delta):
 			moon = HALLOWEEN_MOON_COLOR
 		dirlight.light_color = MOON_COLOR
 		sun.visible = false		
-		
-	sky_color = color
+	
 	worldenv.des_color = color
-	worldenv.ambient_light_color = color.brightened(0.3)
+	wenv.ambient_light_color = color.lightened(0.3)
 	if is_halloween and degalt < -9:
 		var spookiness = clamp((-9 - rad2deg(sky_position.altitude)) / 5, 0, 1)
 		worldenv.des_color *= Color.white.linear_interpolate(Color(1.0, 0.2, 0.2), spookiness)
-		worldenv.ambient_light_color *= Color.white.linear_interpolate(Color(1.0, 0.2, 0.2), spookiness)
+		wenv.ambient_light_color *= Color.white.linear_interpolate(Color(1.0, 0.2, 0.2), spookiness)
 	wenv.tonemap_mode = Environment.TONE_MAPPER_ACES
 	wenv.tonemap_exposure = 1.12
 
