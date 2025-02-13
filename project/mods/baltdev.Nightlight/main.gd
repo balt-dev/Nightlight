@@ -52,31 +52,31 @@ func calculate_day_of_year(year: int, month: int, day: int) -> int:
 func is_leap_year(year: int) -> bool:
 	return (year % 4 == 0 and year % 100 != 0) or (year % 400 == 0)
 
-const MOON_COLOR: Color = Color(0.2, 0.3, 0.5)
-const NIGHT_COLOR: Color = Color(0.05, 0.1, 0.2)
-const DAWN_COLOR: Color = Color(0.1, 0.2, 0.4)
-const SUNRISE_COLOR: Color = Color(0.8, 0.3, 0.1)
-const DAY_COLOR: Color = Color(0.5, 0.7, 1)
+var moon_color: Color
+var night_color: Color
+var dawn_color: Color
+var sunrise_color: Color
+var day_color: Color
 
 const HALLOWEEN_NIGHT_COLOR: Color = Color(0.1, 0.04, 0.02)
-const HALLOWEEN_MOON_COLOR: Color = Color(0.4, 0.0, 0)
+const HALLOWEEN_MOON_COLOR: Color = Color(0.4, 0, 0)
 
 func approximate_skylight_color(altitude : float) -> Color:
 	altitude += 5# hack
-	var night = NIGHT_COLOR
+	var night = night_color
 	if is_halloween:
 		night = HALLOWEEN_NIGHT_COLOR
 	if altitude < -4:
 		var twilight_factor = clamp(-(4 + max(altitude, - 10)) / 6.0, 0.0, 1.0)
-		return DAWN_COLOR.linear_interpolate(night, twilight_factor)
+		return dawn_color.linear_interpolate(night, twilight_factor)
 	elif altitude < 0:
 		var sunrise_factor = clamp(-altitude / 4.0, 0.0, 1.0)
-		return SUNRISE_COLOR.linear_interpolate(DAWN_COLOR, sunrise_factor)
+		return sunrise_color.linear_interpolate(dawn_color, sunrise_factor)
 	elif altitude < 7:
 		var day_factor = clamp(altitude / 7.0, 0.0, 1.0)
-		return SUNRISE_COLOR.linear_interpolate(DAY_COLOR, day_factor)
+		return sunrise_color.linear_interpolate(day_color, day_factor)
 	else:
-		return DAY_COLOR
+		return day_color
 
 var worldenv: WorldEnvironment
 var dirlight: DirectionalLight
@@ -142,14 +142,14 @@ func _physics_process(_delta):
 		dirlight.rotation.x = sky_position.altitude
 		dirlight.rotation.y = sky_position.azimuth		
 		dirlight.light_energy = clamp((-9 - rad2deg(sky_position.altitude)) / 5, 0, 1)
-		var moon = MOON_COLOR
+		var moon = moon_color
 		if is_halloween:
 			moon = HALLOWEEN_MOON_COLOR
-		dirlight.light_color = MOON_COLOR
+		dirlight.light_color = moon
 		sun.visible = false		
 	
 	worldenv.des_color = color
-	wenv.ambient_light_color = color.lightened(0.3)
+	wenv.ambient_light_color = color.lightened(config.ambient_color_brightness)
 	if is_halloween and degalt < -9:
 		var spookiness = clamp((-9 - rad2deg(sky_position.altitude)) / 5, 0, 1)
 		worldenv.des_color *= Color.white.linear_interpolate(Color(1.0, 0.2, 0.2), spookiness)
@@ -161,7 +161,13 @@ var config: Dictionary = {}
 var default_config: Dictionary = {
 	"latitude": 40,
 	"longitude": -90,
-	"time_scale": 1
+	"time_scale": 1,
+	"moon_color_r": 0.2, "moon_color_g": 0.3, "moon_color_b": 0.5,
+	"night_color_r": 0.05, "night_color_g": 0.1, "night_color_b": 0.2,
+	"dawn_color_r": 0.1, "dawn_color_g": 0.2, "dawn_color_b": 0.4,
+	"sunrise_color_r": 0.8, "sunrise_color_g": 0.3, "sunrise_color_b": 0.1,
+	"day_color_r": 0.8, "day_color_g": 0.95, "day_color_b": 1,
+	"ambient_color_brightness": 0.1
 }
 
 onready var TackleBox := $"/root/TackleBox"
@@ -181,6 +187,7 @@ func _init_config() -> void:
 			saved_config[key] = default_config[key] # Set it to the default
 	
 	config = saved_config
+	update_colors()
 	TackleBox.set_mod_config(MOD_ID, config) # Save it to a config file!
 
 func _on_config_update(mod_id, new_config):
@@ -191,3 +198,11 @@ func _on_config_update(mod_id, new_config):
 		return
 	
 	config = new_config # Set the local config variable to the updated config
+	update_colors()
+
+func update_colors():
+	moon_color = Color(config.moon_color_r, config.moon_color_g, config.moon_color_b)
+	night_color = Color(config.night_color_r, config.night_color_g, config.night_color_b)
+	dawn_color = Color(config.dawn_color_r, config.dawn_color_g, config.dawn_color_b)
+	sunrise_color = Color(config.sunrise_color_r, config.sunrise_color_g, config.sunrise_color_b)
+	day_color = Color(config.day_color_r, config.day_color_g, config.day_color_b)
