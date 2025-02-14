@@ -195,10 +195,10 @@ const STARS_SCENE: PackedScene = preload("res://mods/baltdev.Nightlight/stars.ts
 
 func _ready() -> void:
 	_init_config()
-	#TackleBox.connect("mod_config_updated", self, "_on_config_update")
+	TackleBox.connect("mod_config_updated", self, "_on_config_update")
 
 func _init_config() -> void:
-	var saved_config = {}#TackleBox.get_mod_config(MOD_ID)
+	var saved_config = TackleBox.get_mod_config(MOD_ID)
 
 	for key in default_config.keys():
 		if not key in saved_config: # If the config property isn't saved...
@@ -206,7 +206,7 @@ func _init_config() -> void:
 	
 	config = saved_config
 	update_colors()
-	#TackleBox.set_mod_config(MOD_ID, config) # Save it to a config file!
+	TackleBox.set_mod_config(MOD_ID, config) # Save it to a config file!
 
 func _on_config_update(mod_id, new_config):
 	if mod_id != MOD_ID: # Check if it's our mod being updated
