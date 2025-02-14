@@ -1,0 +1,26 @@
+[gd_scene load_steps=6 format=2]
+
+[ext_resource path="res://mods/baltdev.Nightlight/star_part.tres" type="Shader" id=2]
+[ext_resource path="res://mods/baltdev.Nightlight/star_mesh.tres" type="Shader" id=3]
+
+[sub_resource type="ShaderMaterial" id=1]
+shader = ExtResource( 2 )
+shader_param/dist = 2000.0
+
+[sub_resource type="ShaderMaterial" id=2]
+shader = ExtResource( 3 )
+shader_param/desired_size = 0.002
+shader_param/opacity = 1.0
+
+[sub_resource type="QuadMesh" id=3]
+material = SubResource( 2 )
+
+[node name="Particles" type="Particles"]
+transform = Transform( 0.999999, 0, 0, 0, 1, 0, 0, 0, 0.999999, 0, 0, 0 )
+amount = 6400
+lifetime = 999999.0
+explosiveness = 1.0
+fract_delta = false
+visibility_aabb = AABB( -10000, -10000, -10000, 20000, 20000, 20000 )
+process_material = SubResource( 1 )
+draw_pass_1 = SubResource( 3 )

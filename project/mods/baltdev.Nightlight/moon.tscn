@@ -1,0 +1,26 @@
+[gd_scene load_steps=2 format=2]
+
+[ext_resource path="res://mods/baltdev.Nightlight/sun.png" type="Texture" id=2]
+
+[node name="Spatial" type="DirectionalLight"]
+transform = Transform( -1, 8.74228e-08, 0, -8.74228e-08, -1, 0, 0, 0, 1, 0, 0, 0 )
+light_color = Color( 0.670588, 0.913725, 0.917647, 1 )
+light_energy = 0.1
+light_specular = 1.761
+light_bake_mode = 0
+directional_shadow_mode = 0
+directional_shadow_max_distance = 8192.0
+
+[node name="Sprite3D" type="Sprite3D" parent="."]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 2000 )
+sorting_use_aabb_center = false
+cast_shadow = 0
+extra_cull_margin = 16384.0
+generate_lightmap = false
+modulate = Color( 0.741176, 0.764706, 0.764706, 1 )
+pixel_size = 5.9
+billboard = 1
+double_sided = false
+alpha_cut = 2
+render_priority = 8
+texture = ExtResource( 2 )

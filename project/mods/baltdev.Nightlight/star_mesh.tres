@@ -1,0 +1,53 @@
+[gd_resource type="Shader" format=2]
+
+[resource]
+code = "shader_type spatial;
+
+render_mode unshaded, cull_disabled, blend_add;
+
+uniform float desired_size;
+uniform float opacity;
+varying float id;
+
+void vertex() {
+	vec4 world_space_position = WORLD_MATRIX * vec4(VERTEX, 1.0);
+	vec4 view_space_position = INV_CAMERA_MATRIX * world_space_position;
+	float dist = length(view_space_position);
+	
+	float viewport_ratio = VIEWPORT_SIZE.y / VIEWPORT_SIZE.x;
+	vec4 clip_space = vec4(UV * 2.0 - 1.0, 0.0, 0.0);
+	clip_space.x *= viewport_ratio;
+	clip_space *= dist * desired_size;
+	vec4 view_space = INV_PROJECTION_MATRIX * clip_space;
+	vec4 world_space = CAMERA_MATRIX * view_space;
+	vec4 model_space = inverse(WORLD_MATRIX) * world_space;
+	VERTEX = model_space.xyz;
+	id = intBitsToFloat(INSTANCE_ID);
+}
+
+float rand_from_seed(in uint seed) {
+  int k;
+  int s = int(seed);
+  if (s == 0)
+    s = 305420679;
+  k = s / 127773;
+  s = 16807 * (s - k * 127773) - 2836 * k;
+  if (s < 0)
+    s += 2147483647;
+  seed = uint(s);
+  return float(seed % uint(65536)) / 65535.0;
+}
+
+uint hash(uint x) {
+  x = ((x >> uint(16)) ^ x) * uint(73244475);
+  x = ((x >> uint(16)) ^ x) * uint(73244475);
+  x = (x >> uint(16)) ^ x;
+  return x;
+}
+
+void fragment() {
+	uint index = floatBitsToUint(id);
+	uint hash = hash(index + uint(500000));
+	float rand = rand_from_seed(hash);
+	ALPHA = rand * rand * opacity;
+}"

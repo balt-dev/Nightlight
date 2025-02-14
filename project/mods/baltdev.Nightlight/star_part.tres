@@ -1,0 +1,47 @@
+[gd_resource type="Shader" format=2]
+
+[resource]
+code = "shader_type particles;
+
+uniform float dist;
+
+float rand_from_seed(in uint seed) {
+  int k;
+  int s = int(seed);
+  if (s == 0)
+    s = 305420679;
+  k = s / 127773;
+  s = 16807 * (s - k * 127773) - 2836 * k;
+  if (s < 0)
+    s += 2147483647;
+  seed = uint(s);
+  return float(seed % uint(65536)) / 65535.0;
+}
+
+uint hash(uint x) {
+  x = ((x >> uint(16)) ^ x) * uint(73244475);
+  x = ((x >> uint(16)) ^ x) * uint(73244475);
+  x = (x >> uint(16)) ^ x;
+  return x;
+}
+
+const float PI = 3.1415926536;
+
+void vertex() {
+  if (RESTART) {
+	uint seed1 = hash(uint(INDEX));
+	uint seed2 = hash(uint(INDEX) + uint(1));
+    /// distribute stars
+	float a = rand_from_seed(seed1);
+	float b = rand_from_seed(seed2);
+	float phi = a * 2.0 * PI;
+	float theta = acos(2.0 * b - 1.0);
+	vec3 dir = vec3(
+		sin(theta) * cos(phi),
+		sin(theta) * sin(phi),
+		cos(theta)
+	);
+	dir *= dist;
+	TRANSFORM[3].xyz = dir;
+  }
+}"
